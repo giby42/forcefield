@@ -158,7 +158,7 @@ end do
         end do
     print*,"cycles",cycles
     print*,"E ori",E_ori,"E accept",E_accept
-    print*,"n_a",n_a,"n_b",n_b,"n_c",n_c
+   ! print*,"n_a",n_a,"n_b",n_b,"n_c",n_c
     end subroutine converge
     
     end module Metropolis
