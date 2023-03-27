@@ -2,7 +2,7 @@
 
 General description
 
-a.This program is writen by fortran90 on visual studio without any using of extern library
+a.This program is writen by fortran90 on visual studio2019 without any using of extern library
 
 b.This program uses force field method to first give a energy of a given hydrocarbon(the structure could be branced or cycled) and then use Metropolis algorithm to do subsequent energy minimization.
 
