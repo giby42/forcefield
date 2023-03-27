@@ -1,0 +1,39 @@
+program main
+    use func
+    use calculate
+    use Metropolis
+    use driven
+    implicit none 
+    real(8) :: E
+    character(40):: file_name
+    character(40):: energy_type
+    file_name = "c4h10.xyz"
+    energy_type = "Torsional"
+   call readfile(file_name)
+ !write(*,*) bonds(2,:)
+ !***************************************************************计算能量
+ write(*,*)"Stretch",Stretch(bonds,atom_total_num,atom_carbon_num)
+ write(*,*)"Electrostatic",Electrostatic(distance,atom_total_num,atom_carbon_num)
+ write(*,*) "vdw",vdw(distance,bonds,atom_total_num,atom_carbon_num)
+ write(*,*) "Bending",Bending(distance,bonds,atom_total_num,atom_carbon_num)
+ write(*,*) "Torsional",Torsional(position,distance,bonds,atom_total_num,atom_carbon_num)
+   !******************************************
+E=Stretch(bonds,atom_total_num,atom_carbon_num)
+
+E=E+Electrostatic(distance,atom_total_num,atom_carbon_num)
+
+ E=E+vdw(distance,bonds,atom_total_num,atom_carbon_num)
+
+ E=E+Bending(distance,bonds,atom_total_num,atom_carbon_num)
+ 
+E=E+Torsional(position,distance,bonds,atom_total_num,atom_carbon_num)
+print*,"E ori",E
+!**************************************************************
+  deallocate(distance)
+  !*******************************************energy optimize
+   call converge(position,bonds,atom_total_num,atom_carbon_num,E,energy_type)
+ !**************************************************************   
+     deallocate(bonds)
+      deallocate(position)
+     pause
+    end program main
