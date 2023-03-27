@@ -1,0 +1,169 @@
+module func
+      implicit none
+    !parameter of stretch energy
+    real(8),parameter :: k_c_c = 310.0!force constant of carbon carbon bond
+    real(8),parameter :: k_c_h = 340.0!force constant of carbon hydrogen bond
+    real(8),parameter :: r_opt_c_c = 1.526!optimal carbon carbon bond length,A
+    real(8),parameter :: r_opt_c_h = 1.090!optimal carbon hydrogen bond length,A
+    !parameter of bending energy
+    real(8),parameter :: k_bending_c_c_c = 40.0!!bending constant of carbon carbon carbon angle
+    real(8),parameter :: angle_opt_c_c_c = 109.50!!optimal bending angle between sp3 carbon
+    !parameter of Torsional Energy
+     real(8),parameter :: V1_half = 1.40
+     real(8),parameter :: n = 3.0 
+    !parameter of electrostatic interactions
+    real(8),parameter :: q_c = -0.344!partial charge of carbon
+    real(8),parameter :: q_h = 0.078!partial charge of hydrogen
+    real(8),parameter :: e0 = 885000000!dielectric constant in Coulomb’s law ,unit: C**2/(N*A**2)
+    real(8),parameter :: pi = 3.1415926
+    !parameter of Van der Wall’s forces interactions
+     real(8),parameter :: A_cc =1043080.2307
+     real(8),parameter :: A_ch =97170.81934
+     real(8),parameter :: A_hh = 7516.0770341
+     real(8),parameter :: B_cc =675.612248
+     real(8),parameter :: B_ch = 126.9191599
+     real(8),parameter :: B_hh = 21.725783
+    
+!*********************************************************************************************
+!*********************************************************************************************
+!*********************************************************************************************    
+      
+    contains
+    
+    function  Stretch_Energy(r_ij,i,j,n_carbon) result(E_str)!每次调用只计算一个键的键能，用atom_type是包含所有距离的那个二维矩阵里面的第i，n+1个元素，carbon为1，氢为-1
+    implicit none
+    real(8) :: E_str 
+    real(8),intent(in) :: r_ij!bond length
+    integer,intent(in) :: i,j,n_carbon!i,j is the index of r_ij in matrix
+      E_str =0
+    if(i<=n_carbon .and. j<=n_carbon) then!carbon carbon bond
+          E_str = k_c_c*((r_ij - r_opt_c_c)**2)
+    else
+        E_str = k_c_h*((r_ij - r_opt_c_h)**2) !c-h bond
+        end if
+    end function Stretch_Energy
+    !************************************************************
+    !************************************************************
+    function  Bending_Energy(r_ab,r_bc,r_ac) result(E_bend)!每次调用只计算一个键的bending energy
+    implicit none
+    real(8),intent(in):: r_ab,r_ac,r_bc!rab and rbc are bonds length, rac is the distances between atom a and c
+    real(8) :: E_bend,Theta
+    E_bend = 0
+    Theta = 0
+    Theta = getBendingAngle(r_ab,r_bc,r_ac)!give the angle of angle abc, b is the center atom
+    
+    E_bend =  k_bending_c_c_c*((Theta - angle_opt_c_c_c)**2)
+    end function Bending_Energy
+    !************************************************************
+    !************************************************************
+     function  Torsional_Energy(A,B,C,D) result(E_tor)
+    implicit none
+    real(8),intent(in):: A(3),B(3),C(3),D(3)!the coordinate of atom a,b,c,d
+    real(8) :: E_tor,Theta
+    E_tor = 0 
+    Theta = getTorsionAngle(A, B, C, D)!give the angle between vector BA and CD,atom B and C are the center atom, bond BC is the center bond
+       E_tor = V1_half*(1+cos(n*Theta))                       
+    end function Torsional_Energy
+    !************************************************************
+    !************************************************************
+    function  Electrostatic_Energy(r_ij,i,j,n_carbon) result(E_ele)!这个先缓缓，partial charge还没搞明白呢
+    implicit none
+    real(8),intent(in) :: r_ij!distance between atom i and j
+    integer,intent(in) :: i,j,n_carbon!!i,j is the index of r_ij in matrix
+    real(8) :: E_ele
+    E_ele = 0
+    if(i>n_carbon .and. j>n_carbon) then!氢氢
+      E_ele = q_h**2/4/pi/e0/r_ij
+    else if (i<= n_carbon .and. j<= n_carbon) then!碳碳
+         E_ele = q_c**2/4/pi/e0/r_ij
+    else
+         E_ele = q_c*q_h/4/pi/e0/r_ij!碳氢
+    end if       
+    E_ele = E_ele*0.2389/1000!将焦耳转化成千卡
+    end function Electrostatic_Energy
+    !************************************************************
+    !************************************************************
+    function  Vdw_Energy(r_ij,i,j,n_carbon) result(E_vdw)
+    implicit none
+    real(8),intent(in) :: r_ij
+    integer,intent(in) :: i,j,n_carbon
+    real(8) :: E_vdw
+    E_vdw = 0
+    if(i>n_carbon .and. j>n_carbon) then!氢氢
+        E_vdw = (A_hh/(r_ij**12)) -  (B_hh/(r_ij**6))
+       ! print*,"i",i,"j",j
+       ! print*,"r_ij**12",r_ij
+    else if (i<= n_carbon .and. j<= n_carbon) then!碳碳
+        E_vdw = (A_cc/(r_ij**12)) -  (B_cc/(r_ij**6))
+       ! print*,"i",i,"j",j
+       ! print*,"r_ij**12",r_ij
+    else!碳氢
+          E_vdw = (A_ch/r_ij**12) -  (B_ch/r_ij**6)
+        !  print*,"i",i,"j",j
+        !  print*,"r_ij**12",r_ij
+        end if
+    end function Vdw_Energy
+    !************************************************************
+    !************************************************************
+! 计算四面体扭曲角度计算BA与CD向量的夹角
+function getTorsionAngle(A, B, C, D) result(Theta)
+
+implicit none
+  real(8),intent(in) :: A(3),B(3),C(3),D(3)
+  real(8) :: Theta
+  real(8) :: ax, ay, az  ! A原子的坐标
+  real(8) :: bx, by, bz  ! B原子的坐标
+  real(8) :: cx, cy, cz  ! C原子的坐标
+  real(8) :: dx, dy, dz  ! D原子的坐标
+  real(8) :: abx, aby, abz ! 向量AB的三个分量
+  real(8) :: bcx, bcy, bcz ! 向量BC的三个分量
+  real(8) :: cdx, cdy, cdz ! 向量CD的三个分量
+  real(8) :: axb1, ayb1, azb1 ! 向量AB和向量BC的叉积的三个分量
+  real(8) :: b1xc1, b1yc1, b1zc1 ! 向量BC和向量CD的叉积的三个分量
+  real(8) :: mag_ab, mag_bc, mag_cd, mag_b1c1, dotprod, torsion ! 向量长度、点积、torsional angle
+  abx = B(1)-A(1)
+  aby = B(2)-A(2)
+  abz = B(3)-A(3)
+  mag_ab = sqrt(abx**2 + aby**2 + abz**2)
+  
+  bcx = C(1)-B(1)!cx - bx
+  bcy = C(2)-B(2)
+  bcz = C(3)-B(3)
+  mag_bc = sqrt(bcx**2 + bcy**2 + bcz**2)
+  
+  cdx = D(1)-C(1)!dx - cx
+  cdy = D(2)-C(2)
+  cdz = D(3)-C(3)
+  mag_cd = sqrt(cdx**2 + cdy**2 + cdz**2)
+  
+  axb1 = A(2)*bcz - A(3)*bcy
+  ayb1 = A(3)*bcx - A(1)*bcz
+  azb1 = A(1)*bcy - A(2)*bcx
+  
+  b1xc1 = B(2)*cdz - B(3)*cdy
+  b1yc1 = B(3)*cdx - B(1)*cdz
+  b1zc1 = B(1)*cdy - B(2)*cdx
+  
+  mag_b1c1 = sqrt(b1xc1**2 + b1yc1**2 + b1zc1**2)
+  
+  dotprod = axb1*b1xc1 + ayb1*b1yc1 + azb1*b1zc1
+  
+  Theta = atan2(mag_b1c1*dotprod, mag_ab*mag_bc*mag_cd)
+  Theta = Theta*180/pi
+!print*, "Theta",Theta
+end function getTorsionAngle
+    !***************************************************
+    !***************************************************
+function getBendingAngle(r_ab,r_bc,r_ac) result(Theta)!计算角abc
+implicit none
+real(8),intent(in):: r_ab,r_ac,r_bc
+real(8):: Theta,tem!b is the center atom
+Theta = 0
+tem = (-r_ac**2+r_bc**2+r_ab**2)/2/r_ab/r_bc
+tem = ACOS(tem)
+Theta = tem*180.0/pi
+
+
+end function getBendingAngle
+    
+    end module func
