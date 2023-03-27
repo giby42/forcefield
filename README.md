@@ -23,5 +23,5 @@ H      -1.275127188280       0.303959353789       0.378974418443
 H      -0.033945843010      -0.587122537140      -0.594419436427    
 !*********************************************************************
 The first line is the total atom number in the molecular
-The second line is empty
-from the third line, the first letter indicate the atom type,then follow the coordination of this atom
+The second line is empty.
+From the third line, the first letter indicate the atom type,then follow the coordination of this atom
