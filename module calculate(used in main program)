@@ -21,19 +21,16 @@ module calculate
             exit
         end if
         do j = i+1,atom_carbon_num
-           if(bonds(i,j) > 0) then !计算c-c bonds,只算上三角
+           if(bonds(i,j) > 0) then !search the carbon carbon bonds, only search in the upper trangle range in bonds(:,:)
                 E_str_tem = Stretch_Energy(bonds(i,j),i,j,atom_carbon_num)
-              !  print*,"bonds", bonds(i,j)
-                ! print*, "i",i,"j",j
-               ! print*, " E_str_tem c-c", E_str_tem
                  E_stretch =  E_stretch + E_str_tem
                  E_str_tem = 0
            end if
         end do
     end do
-    do i = 1,atom_carbon_num!!计算c-h bonds，算所有
+    do i = 1,atom_carbon_num!!search the carbon hydrogen bonds
         do j = atom_carbon_num+1,atom_total_num
-           if(bonds(i,j) > 0) then !计算
+           if(bonds(i,j) > 0) then 
                 E_str_tem = Stretch_Energy(bonds(i,j),i,j,atom_carbon_num)
                 ! print*, "i",i,"j",j
                ! print*, " E_str_temc c-h", E_str_tem
@@ -59,10 +56,8 @@ module calculate
         if(i == atom_carbon_num ) then
             exit
         end if
-        do j = i+1,atom_carbon_num!计算c-c atoms,只算上三角
+        do j = i+1,atom_carbon_num!search the carbon carbon interactions, only search in the upper trangle range
                 E_ele_tem =  Electrostatic_Energy(distance(i,j),i,j,atom_carbon_num)
-              !  print*, "i",i,"j",j
-              !  print*, " E_ele_tem c-c", E_ele_tem
                 E_electrostatic =  E_electrostatic +  E_ele_tem
                  E_ele_tem = 0
         end do
@@ -71,15 +66,13 @@ module calculate
         if(i == atom_total_num ) then
             exit
         end if
-        do j = i+1,atom_total_num!计算h-h atoms,只算上三角
+        do j = i+1,atom_total_num!search the hydrogen hydrogen interactions, only search in the upper trangle range
                 E_ele_tem =  Electrostatic_Energy(distance(i,j),i,j,atom_carbon_num)
-              ! print*, "i",i,"j",j
-              ! print*, " E_ele_tem h-h", E_ele_tem
                 E_electrostatic =  E_electrostatic +  E_ele_tem
                  E_ele_tem = 0
         end do
     end do
-     do i = 1,atom_carbon_num!!计算c-h atom，算所有
+     do i = 1,atom_carbon_num!!search the carbon hydrogen interactions
         do j = atom_carbon_num+1,atom_total_num
                 E_ele_tem =  Electrostatic_Energy(distance(i,j),i,j,atom_carbon_num)
               ! print*, "i",i,"j",j
@@ -106,11 +99,9 @@ module calculate
         if(i == atom_carbon_num ) then
             exit
         end if
-        do j = i+1,atom_carbon_num!计算c-c atoms,只算上三角
-            if (distance(i,j) >4.0) then!只计算距离大于4A的原子间的范德华力，因为torsional energy由三键组成，其中最远的两个碳原子大概就是4A左右
+        do j = i+1,atom_carbon_num!search the carbon carbon interactions, only search in the upper trangle range
+            if (distance(i,j) >4.0) 
                 E_vdw_tem =   Vdw_Energy(distance(i,j),i,j,atom_carbon_num)
-               ! print*, "i",i,"j",j
-               ! print*, " E_vdw_tem c-c", E_vdw_tem
                 E_vdw =  E_vdw +  E_vdw_tem
                  E_vdw_tem = 0
             end if
@@ -120,22 +111,18 @@ module calculate
         if(i == atom_total_num ) then
             exit
         end if
-        do j = i+1,atom_total_num!计算h-h atoms,只算上三角
+        do j = i+1,atom_total_num!search the hydrogen hydrogen interactions, only search in the upper trangle range
            if (distance(i,j) >4.0) then
                 E_vdw_tem =   Vdw_Energy(distance(i,j),i,j,atom_carbon_num)
-              ! print*, "i",i,"j",j
-              ! print*, " E_vdw_tem h-h", E_vdw_tem
                 E_vdw =  E_vdw +  E_vdw_tem
                  E_vdw_tem = 0
             end if
         end do
     end do
-     do i = 1,atom_carbon_num!!计算c-h atom，算所有
+     do i = 1,atom_carbon_num!!search the carbon hydrogen interactions
         do j = atom_carbon_num+1,atom_total_num
            if (distance(i,j) >4.0)then
                 E_vdw_tem =   Vdw_Energy(distance(i,j),i,j,atom_carbon_num)
-              ! print*, "i",i,"j",j
-             !  print*, " E_vdw_tem c-h", E_vdw_tem
                 E_vdw =  E_vdw +  E_vdw_tem
                  E_vdw_tem = 0
             end if
@@ -166,8 +153,6 @@ module calculate
                 do k =j+1 ,atom_carbon_num
                     if(bonds(i,k) > 0) then
                        n_c = k
-                     !  write(*,*) "n_b",n_b,"n_a",n_a,"n_c",n_c
-                      ! write(*,*) "bonds(n_b,n_a)",bonds(n_b,n_a),"bonds(n_b,n_a)",bonds(n_b,n_c),"distance(n_a,n_c))",distance(n_a,n_c)
                        E_bend_tem = Bending_Energy(bonds(n_b,n_a),bonds(n_b,n_c),distance(n_a,n_c))!Bending_Energy(r_ab,r_bc,r_ac)
                        E_bending = E_bending + E_bend_tem
                        E_bend_tem = 0
@@ -196,17 +181,17 @@ module calculate
      n_d =0
      do i = 1, atom_carbon_num -1
          if(bonds(i,atom_total_num+1) > 1.5) then
-             do j = i+1 ,atom_carbon_num!这前两个do循环用来找成键的两个碳原子，所以搜索范围只在上三角，且最后一个碳原子完全不用找
-                 if(bonds(i,j) >0 .and. bonds(j,atom_total_num + 1)>1.5) then!验证两个原子是否成键，并验证第二个碳原子的成键数量，必须大于1
+             do j = i+1 ,atom_carbon_num!The first two do loops are used to find the two carbon atoms that form the bond, so the search scope is only in the upper triangle, 
+                                         !and the last carbon atom do not need searched
+                 if(bonds(i,j) >0 .and. bonds(j,atom_total_num + 1)>1.5) then!Verify whether two atoms are bonded, and verify that the number of bonds formed by the second carbon atom must be greater than 1
                      n_b = i
                      n_c = j
-                     do k =1, atom_carbon_num!这个do循环用来找与n_b原子直接相连的碳原子
+                     do k =1, atom_carbon_num!This do loop is used to find a carbon atom directly connected to the n_b atom
                          if(bonds(i,k)>0 .and. k /= j) then
                              n_a = k
-                             do l = 1, atom_carbon_num!这个do循环用来找到与n_c直接相连的碳原子并计算torsion energy
+                             do l = 1, atom_carbon_num!This do loop is used to find a carbon atom directly connected to the n_c atom and calculate the torsional energy between atom n_a,n_b,n_c,n_d
                                  if(bonds(j,l)>0 .and. l/= i .and. l/=j .and. l/=k) then
                                      n_d = l
-                                    ! write(*,*) "n_b",n_b,"n_c",n_c,"n_a",n_a,"n_d",n_d
                                      E_tor_tem= Torsional_Energy(position(n_a,:),position(n_b,:),position(n_c,:),position(n_d,:))!  Torsional_Energy(A,B,C,D)
                                       E_torsion =  E_torsion +E_tor_tem
                                       E_tor_tem = 0
