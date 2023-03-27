@@ -1,8 +1,8 @@
 module driven
     implicit none
-    real(8),allocatable :: position(:,:)!atom_total_num×3的二维矩阵，用来装原子的坐标
-    real(8),allocatable :: distance(:,:)!atom_total_num×atom_total_num+1的二维矩阵，前atom_total_num×atom_total_num的空间用来装原子之间的距离，最后第atom_total_num+1列用于判断原子的成键数
-    real(8),allocatable :: bonds(:,:)!atom_total_num×atom_total_num+1的二维矩阵，前atom_total_num×atom_total_num的空间用来记录原子间成键关系，最后第atom_total_num+1列用于判断原子的成键数
+    real(8),allocatable :: position(:,:)!position(atom_total_num,3), used to store the coordination of each atom
+    real(8),allocatable :: distance(:,:)!distance(atom_total_num,atom_total_num+1)the space of atom_total_num×atom_total_num used to store the distance between each atoms.the atom_total_num+1 column used to record the bonds number of each atoms
+    real(8),allocatable :: bonds(:,:)!bonds(atom_total_num,atom_total_num+1)，the space of atom_total_num×atom_total_num used to figure out if two atom are connect directly，the atom_total_num+1 column used to record the carbon carbon bonds number for only carbon atoms
     integer :: atom_total_num! total atom number
     integer :: atom_carbon_num!total carbon atom number 
     integer :: bonds_carbon_num!the number of carbon carbon bonds number for each carbon atom
@@ -14,17 +14,17 @@ module driven
     integer :: i
     integer :: j
     integer :: number_of_read
-    real(8) :: x!xyz分别是一个原子的xyz坐标
+    real(8) :: x!x is the x component of one atom's coordination
     real(8) :: y
     real(8) :: z
     character :: atom_type
     integer,parameter :: filed = 10
-    integer :: status = 0!判断文件是否读取到结尾，读取到结尾stuatu<0
-    logical :: alive!判断文件是否存在
+    integer :: status = 0!if the input file are readed to the last line ,stuatu<0
+    logical :: alive!give the information about if this document exist or not
     atom_carbon_num = 0
     atom_total_num = 0
     number_of_read = 0
-    !***************************************************************************文件读取与position矩阵的创建
+    !***************************************************************************read input document and build position(:,:)
      inquire(file = file_name,exist = alive)
      if(alive) then
        open(unit = filed,file = file_name,status = "old",action = "read")
@@ -56,7 +56,7 @@ module driven
           distance(i,j) = ((position(i,1)-position(j,1))**2 + (position(i,2)-position(j,2))**2 + (position(i,3)-position(j,3))**2)**0.5        
       end do
   end do
-   !**********************************************************创建bonds
+   !**********************************************************build bonds(:,:)
  do i = 1,atom_total_num
       do j = 1, atom_total_num
           if(abs( distance(i,j) - 1.526 < 0.1) .or. abs( distance(i,j) - 1.090 < 0.1  )) then
@@ -64,7 +64,7 @@ module driven
           end if           
       end do
  end do
-  !**********************************************************记录carbon carbon bond number
+  !**********************************************************record carbon carbon bond number
  do i = 1,atom_carbon_num
         bonds_carbon_num = 0
      do j = 1,atom_carbon_num
