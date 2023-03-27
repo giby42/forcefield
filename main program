@@ -9,9 +9,9 @@ program main
     character(40):: energy_type
     file_name = "c4h10.xyz"
     energy_type = "Torsional"
-   call readfile(file_name)
- !write(*,*) bonds(2,:)
- !***************************************************************计算能量
+    !*********************************************
+   call readfile(file_name)!use the function in module "driven" to build position(:,:),distance(:,:),bonds(:,:),atom_total_num,atom_carbon_num
+ !***************************************************************call function in module "calculate" to give energy
  write(*,*)"Stretch",Stretch(bonds,atom_total_num,atom_carbon_num)
  write(*,*)"Electrostatic",Electrostatic(distance,atom_total_num,atom_carbon_num)
  write(*,*) "vdw",vdw(distance,bonds,atom_total_num,atom_carbon_num)
@@ -31,7 +31,7 @@ print*,"E ori",E
 !**************************************************************
   deallocate(distance)
   !*******************************************energy optimize
-   call converge(position,bonds,atom_total_num,atom_carbon_num,E,energy_type)
+   call converge(position,bonds,atom_total_num,atom_carbon_num,E,energy_type)!use the Metropolis module to do energy minimization
  !**************************************************************   
      deallocate(bonds)
       deallocate(position)
