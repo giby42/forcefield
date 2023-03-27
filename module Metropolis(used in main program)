@@ -1,0 +1,164 @@
+module Metropolis
+    use calculate
+    implicit none
+    
+    contains
+    subroutine converge(position,bonds,atom_total_num,atom_carbon_num,E_ori,energy_type)
+    implicit none
+    real(8) :: E_ori
+    real(8),intent(in) :: position(:,:),bonds(:,:)
+    integer,intent(in) :: atom_carbon_num,atom_total_num
+    character(40),intent(in) :: energy_type
+    !***********************************************
+    real(8) :: E_accept
+    real(8) :: E_tem
+    real(8) ::q,p_a,cycles
+    real(8),allocatable :: position_accept(:,:)
+    real(8),allocatable ::  random(:,:)
+    real(8),allocatable :: position_tem(:,:)
+    real(8),allocatable :: distance_in(:,:)
+    real(8),allocatable :: bonds_in(:,:)
+    integer :: conver_times,i,j,n_a,n_b,n_c
+    real(8),parameter :: k_b = 1.380649E-26!kj/k
+    real(8),parameter :: T = 273!k
+    real(8),parameter :: e = 2.71828
+    real(8),parameter :: r =1
+    !*********************************************
+    allocate(position_accept(atom_total_num,3))
+    allocate(position_tem(atom_total_num,3))
+    allocate( random(atom_total_num,3))
+    allocate(distance_in(atom_total_num,atom_total_num + 1))
+    allocate(bonds_in(atom_total_num,atom_total_num + 1))
+    distance_in = -1
+    bonds_in = -1
+    conver_times =0
+    E_accept =0
+    E_tem =0
+    n_a =0
+    n_c =0
+    n_b =0
+     E_accept = E_ori
+     cycles = 0
+    do i = 1,atom_total_num
+           position_accept(i,1) = position(i,1) 
+           position_accept(i,2) = position(i,2) 
+           position_accept(i,3) = position(i,3)   
+    end do
+    !************************************************
+    do while(conver_times <=10)
+        cycles = cycles +1
+        p_a =0
+        q=0
+        do i = 1, atom_total_num
+      do j = 1,3
+            call random_seed() 
+            call random_number(random(i,j))
+            call random_number(q)
+     random(i,j) = 2.0 * random(i,j) - 1.0 ! 将生成的随机数从0到1映射到-1到1
+      end do   
+  end do
+  do i = 1, atom_total_num
+      do j = 1,3  
+     position_tem(i,j) = position_accept(i,j) + r*random(i,j)!r = 0.2
+    ! print*,"i",i,"j",j,position_tem(i,j)
+    ! print*,"position_accept(i,j)",position_accept(i,j)
+      end do   
+  end do
+ ! print*,"走！"
+  do i = 1,atom_total_num
+      do j = 1, atom_total_num
+          distance_in(i,j) = ((position_tem(i,1)-position_tem(j,1))**2 + (position_tem(i,2)-position_tem(j,2))**2 + (position_tem(i,3)-position_tem(j,3))**2)**0.5        
+      end do
+  end do
+   !**********************************************************创建bonds
+do i = 1,atom_total_num
+    do j = 1,atom_total_num
+        if(bonds(i,j) >0) then
+            bonds_in(i,j) = distance_in(i,j)    
+        end if
+    end do
+end do
+!***************************************************
+   do i = 1,atom_total_num
+       bonds_in(i,atom_total_num+1)= bonds(i,atom_total_num+1)     
+   end do
+ !***********************************************************************   
+ !***********************************************************************   
+   select case(energy_type)
+       case("whole")
+ E_tem=Stretch(bonds_in,atom_total_num,atom_carbon_num)
+ E_tem=E_tem+Electrostatic(distance_in,atom_total_num,atom_carbon_num)
+ E_tem=E_tem+vdw(distance_in,bonds_in,atom_total_num,atom_carbon_num)
+ E_tem=E_tem+Bending(distance_in,bonds_in,atom_total_num,atom_carbon_num) 
+ E_tem=E_tem+Torsional(position_tem,distance_in,bonds,atom_total_num,atom_carbon_num)
+       case("Stretch")
+           E_tem=Stretch(bonds_in,atom_total_num,atom_carbon_num)
+       case("Electrostatic")   
+            E_tem=Electrostatic(distance_in,atom_total_num,atom_carbon_num)
+       case("vdw")   
+           E_tem=vdw(distance_in,bonds_in,atom_total_num,atom_carbon_num)
+       case("Bending")      
+            E_tem=Bending(distance_in,bonds_in,atom_total_num,atom_carbon_num) 
+       case("Torsional") 
+          E_tem=Torsional(position_tem,distance_in,bonds,atom_total_num,atom_carbon_num)
+       case default
+          E_tem=Stretch(bonds_in,atom_total_num,atom_carbon_num)
+          E_tem=E_tem+Electrostatic(distance_in,atom_total_num,atom_carbon_num)
+          E_tem=E_tem+vdw(distance_in,bonds_in,atom_total_num,atom_carbon_num)
+          E_tem=E_tem+Bending(distance_in,bonds_in,atom_total_num,atom_carbon_num) 
+          E_tem=E_tem+Torsional(position_tem,distance_in,bonds,atom_total_num,atom_carbon_num)
+       end select
+ !print*,"E tor",Torsional(position_tem,distance_in,bonds,atom_total_num,atom_carbon_num)
+! print*,"E_tem",E_tem
+!**************************************************************************************** 
+    if(E_tem-E_accept < 0) then
+        E_accept =E_tem
+    do i = 1, atom_total_num
+      do j = 1,3
+     position_accept(i,j) = position_tem(i,j) 
+      end do   
+  end do
+        E_tem = 0
+        n_a = n_a+1
+       ! print*, "应该小于0",E_tem-E_accept
+    !*******************************************
+    else
+        
+        if (E_tem-E_accept < 0.1) then
+            conver_times = conver_times +1
+          n_b = n_b+1
+            ! print*, "应该大于0小于0.1 if 里",E_tem-E_accept
+        end if
+        !******************************************
+      !  print*, "应该大于0小于0.1",E_tem-E_accept
+       ! print*,"e**(-(E_tem-E_accept)/k_b/T)",e**(-(E_tem-E_accept)/k_b/T)
+        p_a = e**(-(E_tem-E_accept)/k_b/T)
+       ! print*,"p_a",p_a
+        !********************************
+        if(p_a>1) then
+            p_a = 1
+        end if
+       ! print*,"q",q,"p_a",p_a
+        !******************************
+        if(q<p_a) then
+              n_c = n_c +1!n_c
+               E_accept =E_tem
+    do i = 1, atom_total_num
+      do j = 1,3
+     position_accept(i,j) = position_tem(i,j) 
+      end do   
+    end do
+        E_tem = 0
+       end if
+   !***************************************     
+    end if
+    
+  !***********************************************************************      
+        
+        end do
+    print*,"cycles",cycles
+    print*,"E ori",E_ori,"E accept",E_accept
+    print*,"n_a",n_a,"n_b",n_b,"n_c",n_c
+    end subroutine converge
+    
+    end module Metropolis
