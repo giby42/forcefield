@@ -1,0 +1,223 @@
+module calculate
+    use func
+    implicit none
+    
+    contains
+    !calculate the total stretch energy of a molecule
+    !************************************************************************
+    !************************************************************************
+    function Stretch(bonds,atom_total_num,atom_carbon_num) result(E_stretch)
+    implicit none
+    real(8) :: E_stretch
+    real(8) :: E_str_tem
+    real(8),intent(in) :: bonds(:,:)
+    integer,intent(in) :: atom_total_num, atom_carbon_num
+    integer :: i,j
+    E_stretch = 0
+    E_str_tem = 0
+    !calculate the total stretch energy of carbon carbon bonds
+    do i = 1, atom_carbon_num 
+        if(i == atom_carbon_num ) then
+            exit
+        end if
+        do j = i+1,atom_carbon_num
+           if(bonds(i,j) > 0) then !计算c-c bonds,只算上三角
+                E_str_tem = Stretch_Energy(bonds(i,j),i,j,atom_carbon_num)
+              !  print*,"bonds", bonds(i,j)
+                ! print*, "i",i,"j",j
+               ! print*, " E_str_tem c-c", E_str_tem
+                 E_stretch =  E_stretch + E_str_tem
+                 E_str_tem = 0
+           end if
+        end do
+    end do
+    do i = 1,atom_carbon_num!!计算c-h bonds，算所有
+        do j = atom_carbon_num+1,atom_total_num
+           if(bonds(i,j) > 0) then !计算
+                E_str_tem = Stretch_Energy(bonds(i,j),i,j,atom_carbon_num)
+                ! print*, "i",i,"j",j
+               ! print*, " E_str_temc c-h", E_str_tem
+                 E_stretch =  E_stretch + E_str_tem
+                 E_str_tem = 0
+           end if
+        end do
+    end do  
+    end function Stretch
+!calculate the total electronic energy of a molecule
+!************************************************************************
+!************************************************************************ 
+    function  Electrostatic(distance,atom_total_num,atom_carbon_num) result(E_electrostatic)
+    implicit none
+    real(8) :: E_electrostatic
+    real(8) :: E_ele_tem
+    real(8),intent(in) :: distance(:,:)
+    integer,intent(in) :: atom_total_num, atom_carbon_num
+    integer :: i,j
+     E_electrostatic = 0
+     E_ele_tem = 0
+     do i = 1, atom_carbon_num 
+        if(i == atom_carbon_num ) then
+            exit
+        end if
+        do j = i+1,atom_carbon_num!计算c-c atoms,只算上三角
+                E_ele_tem =  Electrostatic_Energy(distance(i,j),i,j,atom_carbon_num)
+              !  print*, "i",i,"j",j
+              !  print*, " E_ele_tem c-c", E_ele_tem
+                E_electrostatic =  E_electrostatic +  E_ele_tem
+                 E_ele_tem = 0
+        end do
+    end do
+     do i = atom_carbon_num + 1,atom_total_num
+        if(i == atom_total_num ) then
+            exit
+        end if
+        do j = i+1,atom_total_num!计算h-h atoms,只算上三角
+                E_ele_tem =  Electrostatic_Energy(distance(i,j),i,j,atom_carbon_num)
+              ! print*, "i",i,"j",j
+              ! print*, " E_ele_tem h-h", E_ele_tem
+                E_electrostatic =  E_electrostatic +  E_ele_tem
+                 E_ele_tem = 0
+        end do
+    end do
+     do i = 1,atom_carbon_num!!计算c-h atom，算所有
+        do j = atom_carbon_num+1,atom_total_num
+                E_ele_tem =  Electrostatic_Energy(distance(i,j),i,j,atom_carbon_num)
+              ! print*, "i",i,"j",j
+              ! print*, " E_ele_tem c-h", E_ele_tem
+                E_electrostatic =  E_electrostatic +  E_ele_tem
+                 E_ele_tem = 0
+        end do
+     end do  
+      E_electrostatic =  E_electrostatic/1000
+    end function Electrostatic
+    !calculate the total Vdw energy of a molecule
+!************************************************************************
+!************************************************************************ 
+  function  vdw(distance,bonds,atom_total_num,atom_carbon_num) result(E_vdw)
+    implicit none
+    real(8) :: E_vdw
+    real(8) :: E_vdw_tem
+    real(8),intent(in) :: distance(:,:), bonds(:,:)
+    integer,intent(in) :: atom_total_num, atom_carbon_num
+    integer :: i,j
+     E_vdw = 0
+     E_vdw_tem = 0
+     do i = 1, atom_carbon_num 
+        if(i == atom_carbon_num ) then
+            exit
+        end if
+        do j = i+1,atom_carbon_num!计算c-c atoms,只算上三角
+            if (distance(i,j) >4.0) then!只计算距离大于4A的原子间的范德华力，因为torsional energy由三键组成，其中最远的两个碳原子大概就是4A左右
+                E_vdw_tem =   Vdw_Energy(distance(i,j),i,j,atom_carbon_num)
+               ! print*, "i",i,"j",j
+               ! print*, " E_vdw_tem c-c", E_vdw_tem
+                E_vdw =  E_vdw +  E_vdw_tem
+                 E_vdw_tem = 0
+            end if
+        end do
+    end do
+     do i = atom_carbon_num + 1,atom_total_num
+        if(i == atom_total_num ) then
+            exit
+        end if
+        do j = i+1,atom_total_num!计算h-h atoms,只算上三角
+           if (distance(i,j) >4.0) then
+                E_vdw_tem =   Vdw_Energy(distance(i,j),i,j,atom_carbon_num)
+              ! print*, "i",i,"j",j
+              ! print*, " E_vdw_tem h-h", E_vdw_tem
+                E_vdw =  E_vdw +  E_vdw_tem
+                 E_vdw_tem = 0
+            end if
+        end do
+    end do
+     do i = 1,atom_carbon_num!!计算c-h atom，算所有
+        do j = atom_carbon_num+1,atom_total_num
+           if (distance(i,j) >4.0)then
+                E_vdw_tem =   Vdw_Energy(distance(i,j),i,j,atom_carbon_num)
+              ! print*, "i",i,"j",j
+             !  print*, " E_vdw_tem c-h", E_vdw_tem
+                E_vdw =  E_vdw +  E_vdw_tem
+                 E_vdw_tem = 0
+            end if
+        end do
+    end do  
+      end function vdw
+    !calculate the total bending energy of a molecule
+!************************************************************************
+!************************************************************************ 
+    function  Bending(distance,bonds,atom_total_num,atom_carbon_num) result(E_bending)
+    implicit none
+    real(8) :: E_bending, E_bend_tem
+    real(8),intent(in) :: distance(:,:), bonds(:,:)
+    integer,intent(in) :: atom_carbon_num,atom_total_num
+    integer :: i,j,k
+    integer :: n_b,n_a,n_c!n_b is the center carbon atom of angle abc
+    n_a = 0
+    n_b = 0
+    n_c = 0
+    E_bending = 0
+    E_bend_tem = 0
+    do i = 1, atom_carbon_num
+        if(bonds(i,atom_total_num +1) > 1.5) then
+            n_b = i
+        do j = 1,atom_carbon_num
+            if(bonds(i,j) > 0) then
+                n_a = j
+                do k =j+1 ,atom_carbon_num
+                    if(bonds(i,k) > 0) then
+                       n_c = k
+                     !  write(*,*) "n_b",n_b,"n_a",n_a,"n_c",n_c
+                      ! write(*,*) "bonds(n_b,n_a)",bonds(n_b,n_a),"bonds(n_b,n_a)",bonds(n_b,n_c),"distance(n_a,n_c))",distance(n_a,n_c)
+                       E_bend_tem = Bending_Energy(bonds(n_b,n_a),bonds(n_b,n_c),distance(n_a,n_c))!Bending_Energy(r_ab,r_bc,r_ac)
+                       E_bending = E_bending + E_bend_tem
+                       E_bend_tem = 0
+                    end if
+                    end do
+            end if
+        end do    
+        end if
+    end do
+    end function  Bending
+     !calculate the total torsion energy of a molecule
+!************************************************************************
+!************************************************************************ 
+     function  Torsional(position,distance,bonds,atom_total_num,atom_carbon_num) result(E_torsion)
+     implicit none
+     real(8) :: E_torsion, E_tor_tem
+     real(8),intent(in) :: position(:,:),distance(:,:), bonds(:,:)
+     integer,intent(in) :: atom_carbon_num,atom_total_num
+     integer :: i,j,k,l
+     integer :: n_b,n_c,n_d,n_a!n_b,n_c is the center carbon atoms of torsion angle abcd,atom n_a connects to atom n_b
+     E_torsion = 0
+     E_tor_tem = 0
+     n_a =0
+     n_b =0
+     n_c =0
+     n_d =0
+     do i = 1, atom_carbon_num -1
+         if(bonds(i,atom_total_num+1) > 1.5) then
+             do j = i+1 ,atom_carbon_num!这前两个do循环用来找成键的两个碳原子，所以搜索范围只在上三角，且最后一个碳原子完全不用找
+                 if(bonds(i,j) >0 .and. bonds(j,atom_total_num + 1)>1.5) then!验证两个原子是否成键，并验证第二个碳原子的成键数量，必须大于1
+                     n_b = i
+                     n_c = j
+                     do k =1, atom_carbon_num!这个do循环用来找与n_b原子直接相连的碳原子
+                         if(bonds(i,k)>0 .and. k /= j) then
+                             n_a = k
+                             do l = 1, atom_carbon_num!这个do循环用来找到与n_c直接相连的碳原子并计算torsion energy
+                                 if(bonds(j,l)>0 .and. l/= i .and. l/=j .and. l/=k) then
+                                     n_d = l
+                                    ! write(*,*) "n_b",n_b,"n_c",n_c,"n_a",n_a,"n_d",n_d
+                                     E_tor_tem= Torsional_Energy(position(n_a,:),position(n_b,:),position(n_c,:),position(n_d,:))!  Torsional_Energy(A,B,C,D)
+                                      E_torsion =  E_torsion +E_tor_tem
+                                      E_tor_tem = 0
+                                     end if
+                             end do
+                         end if
+                     end do
+                 end if
+             end do
+         end if
+     end do   
+     end function Torsional
+  end module calculate
+        
