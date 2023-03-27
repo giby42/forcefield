@@ -30,7 +30,7 @@ module func
       
     contains
     
-    function  Stretch_Energy(r_ij,i,j,n_carbon) result(E_str)!每次调用只计算一个键的键能，用atom_type是包含所有距离的那个二维矩阵里面的第i，n+1个元素，carbon为1，氢为-1
+    function  Stretch_Energy(r_ij,i,j,n_carbon) result(E_str)
     implicit none
     real(8) :: E_str 
     real(8),intent(in) :: r_ij!bond length
@@ -44,7 +44,7 @@ module func
     end function Stretch_Energy
     !************************************************************
     !************************************************************
-    function  Bending_Energy(r_ab,r_bc,r_ac) result(E_bend)!每次调用只计算一个键的bending energy
+    function  Bending_Energy(r_ab,r_bc,r_ac) result(E_bend)
     implicit none
     real(8),intent(in):: r_ab,r_ac,r_bc!rab and rbc are bonds length, rac is the distances between atom a and c
     real(8) :: E_bend,Theta
@@ -66,20 +66,20 @@ module func
     end function Torsional_Energy
     !************************************************************
     !************************************************************
-    function  Electrostatic_Energy(r_ij,i,j,n_carbon) result(E_ele)!这个先缓缓，partial charge还没搞明白呢
+    function  Electrostatic_Energy(r_ij,i,j,n_carbon) result(E_ele)
     implicit none
     real(8),intent(in) :: r_ij!distance between atom i and j
     integer,intent(in) :: i,j,n_carbon!!i,j is the index of r_ij in matrix
     real(8) :: E_ele
     E_ele = 0
-    if(i>n_carbon .and. j>n_carbon) then!氢氢
+    if(i>n_carbon .and. j>n_carbon) then!hydrogen hydrogen
       E_ele = q_h**2/4/pi/e0/r_ij
-    else if (i<= n_carbon .and. j<= n_carbon) then!碳碳
+    else if (i<= n_carbon .and. j<= n_carbon) then!carbon carbon 
          E_ele = q_c**2/4/pi/e0/r_ij
     else
-         E_ele = q_c*q_h/4/pi/e0/r_ij!碳氢
+         E_ele = q_c*q_h/4/pi/e0/r_ij!carbon hydrogen
     end if       
-    E_ele = E_ele*0.2389/1000!将焦耳转化成千卡
+    E_ele = E_ele*0.2389/1000!transfer J to kcal
     end function Electrostatic_Energy
     !************************************************************
     !************************************************************
@@ -89,15 +89,15 @@ module func
     integer,intent(in) :: i,j,n_carbon
     real(8) :: E_vdw
     E_vdw = 0
-    if(i>n_carbon .and. j>n_carbon) then!氢氢
+    if(i>n_carbon .and. j>n_carbon) then!hydrogen hydrogen
         E_vdw = (A_hh/(r_ij**12)) -  (B_hh/(r_ij**6))
        ! print*,"i",i,"j",j
        ! print*,"r_ij**12",r_ij
-    else if (i<= n_carbon .and. j<= n_carbon) then!碳碳
+    else if (i<= n_carbon .and. j<= n_carbon) then!carbon carbon
         E_vdw = (A_cc/(r_ij**12)) -  (B_cc/(r_ij**6))
        ! print*,"i",i,"j",j
        ! print*,"r_ij**12",r_ij
-    else!碳氢
+    else!carbon hydrogen
           E_vdw = (A_ch/r_ij**12) -  (B_ch/r_ij**6)
         !  print*,"i",i,"j",j
         !  print*,"r_ij**12",r_ij
@@ -105,22 +105,22 @@ module func
     end function Vdw_Energy
     !************************************************************
     !************************************************************
-! 计算四面体扭曲角度计算BA与CD向量的夹角
+! calculate the torsional angle between vector BA and CD
 function getTorsionAngle(A, B, C, D) result(Theta)
 
 implicit none
   real(8),intent(in) :: A(3),B(3),C(3),D(3)
   real(8) :: Theta
-  real(8) :: ax, ay, az  ! A原子的坐标
-  real(8) :: bx, by, bz  ! B原子的坐标
-  real(8) :: cx, cy, cz  ! C原子的坐标
-  real(8) :: dx, dy, dz  ! D原子的坐标
-  real(8) :: abx, aby, abz ! 向量AB的三个分量
-  real(8) :: bcx, bcy, bcz ! 向量BC的三个分量
-  real(8) :: cdx, cdy, cdz ! 向量CD的三个分量
-  real(8) :: axb1, ayb1, azb1 ! 向量AB和向量BC的叉积的三个分量
-  real(8) :: b1xc1, b1yc1, b1zc1 ! 向量BC和向量CD的叉积的三个分量
-  real(8) :: mag_ab, mag_bc, mag_cd, mag_b1c1, dotprod, torsion ! 向量长度、点积、torsional angle
+  real(8) :: ax, ay, az  ! the coordination of atom A
+  real(8) :: bx, by, bz  
+  real(8) :: cx, cy, cz 
+  real(8) :: dx, dy, dz  
+  real(8) :: abx, aby, abz ! three components of vector AB
+  real(8) :: bcx, bcy, bcz ! three components of vector BC
+  real(8) :: cdx, cdy, cdz !  three components of vector CD
+  real(8) :: axb1, ayb1, azb1 ! three components of corss product between vector AB and BC
+  real(8) :: b1xc1, b1yc1, b1zc1 ! three components of corss product between vector BC and CD
+  real(8) :: mag_ab, mag_bc, mag_cd, mag_b1c1, dotprod, torsion ! magnitude of vector、dot product、torsional angle
   abx = B(1)-A(1)
   aby = B(2)-A(2)
   abz = B(3)-A(3)
@@ -154,7 +154,7 @@ implicit none
 end function getTorsionAngle
     !***************************************************
     !***************************************************
-function getBendingAngle(r_ab,r_bc,r_ac) result(Theta)!计算角abc
+function getBendingAngle(r_ab,r_bc,r_ac) result(Theta)!calculate the angle abc
 implicit none
 real(8),intent(in):: r_ab,r_ac,r_bc
 real(8):: Theta,tem!b is the center atom
