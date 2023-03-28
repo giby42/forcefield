@@ -85,7 +85,7 @@ Important: when calculate the vdw and electronic energy between two atoms, we co
 c.bonds(atom_total_num,atom_total_num+1) 
 role: used to record the sturcture of the molecule and record the number of carbon carbon bonds between each carbon atom
 and the surrounding carbon atoms
-shape: similar with distance(atom_total_num,atom_total_num+1). Also as butane as an example
+shape: similar with distance(atom_total_num,atom_total_num+1). Also as butane as an example                                                                             
            -1,cc12,-1,-1,ch15,ch16,ch17,-1,-1,-1,-1,-1,-1,-1,1                                                                                 
            cc21,-1,cc23,-1,-1,-1,-1,ch28,ch29,-1,-1,-1,-1,-1,2                                                                                 
            -1,cc32,-1,cc34,-1,-1,-1,-1,-1,ch310,ch311,-1,-1,-1,2                                                                                 
