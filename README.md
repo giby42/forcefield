@@ -41,21 +41,33 @@ Fourth, the main program use call a subroutine called "converge" in module Metro
 
 !****************************************************************************************************************************************************************
 
-detailed explanation of the function of each module and each subroutine
+detailed explanation of the role of each module and each subroutine
 
 module driven:
          this module cantains one subroutine called "readfile" and five public variables called position(:,3), distance(:,:),bonds(:,:),  atom_total_num, atom_carbon_num. 
          
-function and input of the subroutine "realfile"
-input: when you use this subroutine, you should input the file name you want to read as a string, and be sure the string length is smaller than 40
-function: this subroutine first read the file based on the input file name, then assigning value to the five public variables(position(:,3), distance(:,:),bonds(:,:),  atom_total_num, atom_carbon_num)
+Role and input of the subroutine "realfile"
+Input: when you use this subroutine, you should input the file name you want to read as a string, and be sure the string length is smaller than 40
+Role: this subroutine first read the file based on the input file name, then assigning value to the five public variables(position(:,3), distance(:,:),bonds(:,:),  atom_total_num, atom_carbon_num)
 
-function of the five public variables(position(:,3), distance(:,:),bonds(:,:),  atom_total_num, atom_carbon_num) in module driven:
-        the five public variables are only shared with the main program, and the main program used them as parameter. the reason I do not write functions to return these public variables to main program is for save memory space and make the code short, improve the code efficiency.
+Role of the five public variables(position(atom_total_num,3), distance(atom_total_num,atom_total_num+1),bonds(atom_total_num,atom_total_num+1),  atom_total_num, atom_carbon_num) in module driven:
+
+a.the five public variables are only shared with the main program, and the main program used them as parameter. the reason I do not write functions to return these public variables to main program is for save memory space and make the code short, improve the code efficiency.
+
+b.position(atom_total_num,3)
+
+role: used to store the coordinates of each atom
+size: atom_total_num × 3, atom_total_num,1 for x, atom_total_num,2 for y,atom_total_num,3 for z
+shape: x1,y1,z1
+       x2,y2,z2
+       x3,y3,z3
+       ........
+       xn,yn,zn  (n = atom_total_num)
 !*************************************************************************************************************************************************************
 
 module func:
 this module contains 7 functions called "Stretch_Energy"," Bending_Energy","Torsional_Energy","Electrostatic_Energy","Vdw_Energy","getTorsionAngle","getBendingAngle"
+
 Important: "Stretch_Energy"," Bending_Energy","Torsional_Energy","Electrostatic_Energy","Vdw_Energy" are just computational formula of force field. And in this program module func is just an extension part of module calculate, all these functions in module func could not be used individually.
 
 
