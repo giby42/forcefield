@@ -26,3 +26,17 @@ The first line is the total atom number in the molecular
 The second line is empty.
 From the third line, the first letter indicate the atom type,then follow the coordination of this atom
 f.the input document need to be put in the same file with the program
+!********************************************************************************************************
+!********************************************************************************************************
+!********************************************************************************************************
+structure of program
+
+
+
+
+
+
+
+
+
+
