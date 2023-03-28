@@ -78,10 +78,8 @@ shape:
            ..........................................................................                                                                                   
            hc141,hc142,....................................................hh1615,0.0,-1
            
-           as we could see, this matrix could be divided into 5 region. The 4 × 4(atom_carbon_num × atom_carbon_num) region(row:1 to 4;col:1 to 4) is for two carbon 
-           atom interaction;the 4 × 10 region(row:1 to 4;col:5 to 14) is for one carbon and one hydrogen interactionn; the 10 × 4 region(row:5 to 14;col:1 to 4) is for 
-           one hydrogen and one carbon interactionn; the 10 × 10 region(row:5 to 14;col:5 to 14) is for two hydrogen atom interaction; the 14 × 1 region(row:1 to 
-           14;col:14) is with defult va;ue -1 and not used in matrix distance                                                                                           
+as we could see, this matrix could be divided into 5 region. The 4 × 4(atom_carbon_num × atom_carbon_num) region(row:1 to 4;col:1 to 4) is for two carbon atom interaction;the 4 × 10 region(row:1 to 4;col:5 to 14) is for one carbon and one hydrogen interactionn; the 10 × 4 region(row:5 to 14;col:1 to 4) is for one hydrogen and one carbon interactionn; the 10 × 10 region(row:5 to 14;col:5 to 14) is for two hydrogen atom interaction; the 14 × 1 region(row:1 to 14;col:14) is with defult va;ue -1 and not used in matrix distance      
+
            Important: when calculate the vdw and electronic energy between two atoms, we could based on the position (i,j) where the element appears in the matrix to 
  figure the type of interaction(cc or ch or hh) and because distance(i,j) = diatance(j,i), we could only search the trangle of matrix distance but not the
  whole matrix
