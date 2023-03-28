@@ -59,11 +59,13 @@ b.position(atom_total_num,3)
 role: used to store the coordinates of each atom
 size: atom_total_num × 3, atom_total_num,1 for x, atom_total_num,2 for y,atom_total_num,3 for z
 
-shape: x1,y1,z1                                                                                                                                                         
+shape: 
+       x1,y1,z1                                                                                                                                                         
        x2,y2,z2                                                                                                                                                        
        x3,y3,z3                                                                                                                                                        
        ........                                                                                                                                                         
-       xn,yn,zn  (n = atom_total_num)                                                                                                                                
+       xn,yn,zn  (n = atom_total_num)  
+ first store the coordinates of all carbon atom, then store hydrogen atom
 !*************************************************************************************************************************************************************
 
 module func:
