@@ -81,6 +81,27 @@ shape:
 as we could see, this matrix could be divided into 5 region. The 4 × 4(atom_carbon_num × atom_carbon_num) region(row:1 to 4;col:1 to 4) is for two carbon atom interaction;the 4 × 10 region(row:1 to 4;col:5 to 14) is for one carbon and one hydrogen interactionn; the 10 × 4 region(row:5 to 14;col:1 to 4) is for one hydrogen and one carbon interactionn; the 10 × 10 region(row:5 to 14;col:5 to 14) is for two hydrogen atom interaction; the 14 × 1 region(row:1 to 14;col:14) is with defult va;ue -1 and not used in matrix distance
 
 Important: when calculate the vdw and electronic energy between two atoms, we could based on the position (i,j) where the element appears in the matrix to figure the type of interaction(cc or ch or hh) and because distance(i,j) = diatance(j,i), we could only search the upper trangle of matrix distance(atom_total_num,atom_total_num+1) but not the whole matrix
+
+c.bonds(atom_total_num,atom_total_num+1) 
+role: used to record the sturcture of the molecule and record the number of carbon carbon bonds between each carbon atom
+and the surrounding carbon atoms
+shape: similar with distance(atom_total_num,atom_total_num+1). Also as butane as an example
+           -1,cc12,-1,-1,ch15,ch16,ch17,-1,-1,-1,-1,-1,-1,-1,1                                                                                 
+           cc21,-1,cc23,-1,-1,-1,-1,ch28,ch29,-1,-1,-1,-1,-1,2                                                                                 
+           -1,cc32,-1,cc34,-1,-1,-1,-1,-1,ch310,ch311,-1,-1,-1,2                                                                                 
+           -1,-1,cc43,-1,-1,-1,-1,-1,-1,-1,-1,ch412,ch413,ch414,1                                                                                 
+           hc51,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1                                                                                 
+           hc61,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1                                                                                 
+           hc71,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1                                                                                    
+           -1,hc82,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1                                                                                   
+           -1,hc92,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1                                                                                    
+           -1,-1,hc103,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1 
+           -1,-1,hc113,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1 
+           -1,-1,-1,hc124,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1 
+           -1,-1,-1,hc134,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1 
+           -1,-1,-1,hc144,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1 
+  as we could see, this matrix also could be divided into 5 region. The 4 × 4(atom_carbon_num × atom_carbon_num) region(row:1 to 4;col:1 to 4) is give the carbon skeleton of the molecule;the 4 × 10 region(row:1 to 4;col:5 to 14) plus the 4 × 4 region(row:1 to 4;col:1 to 4) gives the whole structure of the molecule; the 10 × 4 region(row:5 to 14;col:1 to 4) is for one hydrogen-carbon bonds; the 10 × 10 region(row:5 to 14;col:5 to 14) is for hydrogen-hydrogen bond(impossiable in hydrocarbon,); the 14 × 1 region(row:1 to 14;col:14) gives  the number of carbon carbon bonds between each carbon atom and the surrounding carbon atoms. 
+  its obviously in the matrix, carbon 1 form only 1 carbon carbon bonds with carbon 2 and form 3 carbon hydrogen bonds with hydrogen 5,6,7
 !*************************************************************************************************************************************************************
 
 module func:
