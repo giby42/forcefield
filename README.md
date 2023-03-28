@@ -6,7 +6,7 @@ a.This program is writen by fortran90 on visual studio2019 without any using of 
 
 b.This program uses force field method to first give a energy of a given hydrocarbon(the structure could be branced or cycled) and then use Metropolis algorithm to do subsequent energy minimization.
 
-c.all teses parameter related to forcefield used in this prigram are found in literature "J. Am. Chem. SOC. 1995, 117, 5179-5197" and the final units of the energy is kcal
+c.all theses parameters and formula related to forcefield calculation used in this program are found in literature "J. Am. Chem. SOC. 1995, 117, 5179-5197" and the final units of the energy is kcal
 
 d.Van-der Walls’ interactions between two atoms whose distance smaller than 4A are not calculated. Because if two atoms close together, the Van-der Walls’ interactions has been included in Stretch,Bending and Torsional energy. Because when calculate Torsional energy, it cross three bonds and the three bonds distance are almost 4A
 
@@ -47,7 +47,9 @@ function: this subroutine first read the file based on the input file name, then
 function of the five public variables(position(:,3), distance(:,:),bonds(:,:),  atom_total_num, atom_carbon_num) in module driven:
         the five public variables are only shared with the main program, and the main program used them as parameter. the reason I do not write functions to return these public variables to main program is for save memory space and make the code short, improve the code efficiency.
 !*************************************************************************************************************************************************************
-module func
+module func:
+this module contains 7 functions called "Stretch_Energy"," Bending_Energy","Torsional_Energy","Electrostatic_Energy","Vdw_Energy","getTorsionAngle","getBendingAngle"
+Important: "Stretch_Energy"," Bending_Energy","Torsional_Energy","Electrostatic_Energy","Vdw_Energy" are just computational formula of force field. And in this program module func is just an extension part of module calculate, all these functions in module func could not be used individually.
 
 
 
