@@ -156,6 +156,17 @@ end do
         end do
     print*,"converge cycles",cycles
     print*,"E ori",E_ori,"E accept",E_accept
+    Open( 12 , File = 'minimized.txt' )
+    write(12,*) "minimized energy",E_accept
+    write(12,*) "total atom number",atom_total_num
+    write(12,*) "the following is carbon atom"
+    do i = 1,atom_total_num
+        if(i == atom_carbon_num +1) then
+             write(12,*) "the following is hydrogen atom"
+        end if
+     write(12,*) position_accept(i,:)  
+    end do
+    close(12)
     end subroutine converge
     
     end module Metropolis
