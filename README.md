@@ -95,11 +95,11 @@ shape: similar with distance(atom_total_num,atom_total_num+1). Also as butane as
            hc71,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1                                                                                    
            -1,hc82,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1                                                                                   
            -1,hc92,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1                                                                                    
-           -1,-1,hc103,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1 
-           -1,-1,hc113,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1 
-           -1,-1,-1,hc124,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1 
-           -1,-1,-1,hc134,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1 
-           -1,-1,-1,hc144,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1 
+           -1,-1,hc103,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1                                                                                                             
+           -1,-1,hc113,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1                                                                                                             
+           -1,-1,-1,hc124,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1                                                                                                             
+           -1,-1,-1,hc134,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1                                                                                                             
+           -1,-1,-1,hc144,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1                                                                                                             
   as we could see, this matrix also could be divided into 5 region. The 4 × 4(atom_carbon_num × atom_carbon_num) region(row:1 to 4;col:1 to 4) is give the carbon skeleton of the molecule;the 4 × 10 region(row:1 to 4;col:5 to 14) plus the 4 × 4 region(row:1 to 4;col:1 to 4) gives the whole structure of the molecule; the 10 × 4 region(row:5 to 14;col:1 to 4) is for one hydrogen-carbon bonds; the 10 × 10 region(row:5 to 14;col:5 to 14) is for hydrogen-hydrogen bond(impossiable in hydrocarbon,); the 14 × 1 region(row:1 to 14;col:14) gives  the number of carbon carbon bonds between each carbon atom and the surrounding carbon atoms. 
   its obviously in the matrix, carbon 1 form only 1 carbon carbon bonds with carbon 2 and form 3 carbon hydrogen bonds with hydrogen 5,6,7
 !*************************************************************************************************************************************************************
