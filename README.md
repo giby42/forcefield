@@ -66,7 +66,7 @@ shape:
  first store the coordinates of all carbon atom, then store hydrogen atom
  
  c.distance(atom_total_num,atom_total_num+1)                                                                                                                           
- role: used to store the distance between an atom and all other surrounding atoms                                                                                        shape:use butane as an example(atom_total_num = 14,atom_carbon_num = 4)                                                                                                                                         
+ role: used to store the distance between an atom and all other surrounding atoms                                                                                       shape:use butane as an example(atom_total_num = 14,atom_carbon_num = 4)                                                                                                                                                                                                                                      
            0,cc12,cc13,cc14,ch15,ch16,ch17,ch18,ch19,ch110,ch111,ch112,ch113,ch114,-1                                                                                   
            cc21,0,cc23,cc24,ch25,ch26,ch27,ch28,ch29,ch210,ch211,ch212,ch213,ch214,-1                                                                                   
            cc31,cc32,0,cc34,ch35,ch36,ch37,ch38,ch39,ch310,ch311,ch312,ch313,ch314,-1                                                                                   
@@ -76,8 +76,9 @@ shape:
            ..........................................................................                                                                                   
            ..........................................................................                                                                                   
            ..........................................................................                                                                                   
-           hc141,hc142,....................................................hh1615,0,-1                                                                                  as we could see, this matrix could be divided into 5 region.                                                                                                         
-           the 4 × 4(atom_carbon_num × atom_carbon_num) region(row:1 to 4;col:1 to 4) is for two carbon atom interaction;the 4 × 10 region(row:1 to 4;col:5 to 14) is for one carbon and one hydrogen interactionn; the 10 × 4 region(row:5 to 14;col:1 to 4) is for one hydrogen and one carbon interactionn; the 10 × 10 region(row:5 to 14;col:5 to 14) is for two hydrogen atom interaction; the 14 × 1 region(row:1 to 14;col:14) is with defult va;ue -1 and not used in matrix distance                      Important: 
+           hc141,hc142,....................................................hh1615,0,-1
+           
+           as we could see, this matrix could be divided into 5 region. The 4 × 4(atom_carbon_num × atom_carbon_num) region(row:1 to 4;col:1 to 4) is for two carbon atom interaction;the 4 × 10 region(row:1 to 4;col:5 to 14) is for one carbon and one hydrogen interactionn; the 10 × 4 region(row:5 to 14;col:1 to 4) is for one hydrogen and one carbon interactionn; the 10 × 10 region(row:5 to 14;col:5 to 14) is for two hydrogen atom interaction; the 14 × 1 region(row:1 to 14;col:14) is with defult va;ue -1 and not used in matrix distance                      Important: 
 !*************************************************************************************************************************************************************
 
 module func:
