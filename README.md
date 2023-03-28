@@ -29,8 +29,14 @@ f.the input document need to be put in the same file with the program
 !********************************************************************************************************
 !********************************************************************************************************
 !********************************************************************************************************
-structure of program
 
+structure of program
+first, the main program call a subroutine called "readfile" in module driven
+second,the main program use functions called "Stretch", "Bending","Torsional","Electrostatic","vdw" in module calculate respectly, these function will return stretch energy, bending energy,torsional energy, electrostatic energy and Van-der Walls energy of the whole molecule 
+third, the main add stretch energy, bending energy,torsional energy, electrostatic energy and Van-der Walls energy together to get the total energy of the molecule
+fourth, the main program use call a subroutine called "converge" in module Metropolis. The subroutine "converge" will generate a file contains the minimization energy and minimized geometry of the molecule and print the minimized energy on screen
+!***********************************************************************************************
+detailed explanation of the function of each module and each subroutine
 
 
 
