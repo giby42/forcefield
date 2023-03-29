@@ -199,7 +199,16 @@ cand find the coordinate of carbon atom 1,2,3,4 in matrix position(2,:),position
  "Torsional_Energy" in module func and get the torsional energy of torsional angle 1-2-3-4. 
  
  sixth, using the same method loop other row in matrix bonds(:,:) whose bonds(row_number,atom_total_num+1) >1 and finally get the whole torsional energy of molecule
-
+ 
+ module Metropolis: this module contains only one subroutine called "converge",which is used to do energy minimization and this module need to use module calculate
+ input:position(:,:),bonds(:,:),atom_total_num(integer),atom_carbon_num(integer),E_ori(the energy you want to minimize,real),energy_type(the minimized energy
+ type,string) for energy type: "Stretch","Bending","Torsional","Electrostatic","vdw",and the default is minimize the total
+ energy("Stretch"+"Bending"+"Torsional"+"Electrostatic"+"vdw"), if you want to use defult, just enter a random string is ok
+ 
+ output: The subroutine "converge" will generate a file contains the minimization energy and minimized geometry of the molecule and print the energy before minimized 
+ ,energy after minimized and the converge cycles(how many calculation times happened in Metropolis algorithm)
+ 
+ converge condition: 0 < delt E < 0.1 for 10 times
 
 
 
