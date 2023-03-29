@@ -109,6 +109,33 @@ this module contains 7 functions called "Stretch_Energy"," Bending_Energy","Tors
 
 Important: "Stretch_Energy"," Bending_Energy","Torsional_Energy","Electrostatic_Energy","Vdw_Energy" are just computational formula of force field. And in this program module func is just an extension part of module calculate, all these functions in module func could not be used individually.
 
+module calculate:
+this module contains 5 functions called "Stretch","Electrostatic","vdw"," Bending","Torsional". The five functions correspond to "Stretch_Energy",
+Electrostatic_Energy","Vdw_Energy","Bending_Energy","Torsional_Energy" in module func respectively
+
+"Stretch":
+input: bonds(atom_total_num,atom_total_num+1),atom_total_num(integer),atom_carbon_num(integer)
+output: E_stretch(the stretch energy of molecule)
+
+role:the  stretch energy of molecule contains both carbon carbon bond stretch energy and carbon hydrogen bond stretch energy.
+     the "Stretch" function only search the upper trangle 4 × 4(atom_carbon_num × atom_carbon_num) region(row:1 to 4;col:1 to 4) and the whole  4 × 10 region(row:1 
+     to 4;col:5 to 14) of matrix bonds(atom_total_num,atom_total_num+1). If the element in the bonds(atom_total_num,atom_total_num+1) is bigger than 0, then call
+     "Stretch_Energy"  in module func, input the bond length(bonds(i,j)) and the index i,j and atom_carbon_num to "Stretch_Energy", and "Stretch_Energy" will based 
+     on the index i,j and tom_carbon_num to distinguish the bond type(cc or ch), then give the corresponding Stretch energy of a single bond. After loop over,add all these 
+     single bond stretch energy together and get the stretch energy of the whole molecule
+     
+"Electrostatic" and "Vdw":
+input:distance(atom_total_num,atom_total_num+1),atom_total_num(integer),atom_carbon_num(integer)
+output: "Electrostatic_Energy" gives E_electrostatic(the electronic energy of molecule); "Vdw_Energy" gives E_vdw(the van der wall's energy of molecule)
+
+role: the working principles are the same for "Electrostatic" and "Vdw" and quite similar with "Stretch". But this time they loop the upper trangle
+region of matrix distance(atom_total_num,atom_total_num+1). In "Electrostatic_Energy", don't make any judgments about distance(i,j), call "Electrostatic_Energy" in
+module func, input the diatance between two atom(distance(i,j)) and the index i,j and atom_carbon_num to "Electrostatic_Energy", and "Electrostatic_Energy" will based
+on the index i,j and atom_carbon_num to distinguish the interaction type(cc or ch or hh), then give the corresponding Electrostatic energy of between two atoms.
+In "vdw_Energy", it first check if diatance(i,j) > 4A. only when the distance between two atoms bigger than 4A, "vdw_Energy" call "Vdw_Energy" in module func and
+give the corresponding vdw energy between two atoms. the input of "Vdw_Energy" is the same as Electrostatic_Energy"
+
+
 
 
 
