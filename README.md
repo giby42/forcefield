@@ -161,8 +161,45 @@ Then, use bending angle 213 as an example, we acquire distance(2,1),diatance(2,3
 distance(2,1),diatance(2,3),distance(1,3) to "Bending_Energy" in module func, and get the bending angle of bending angle 213
 
 "Torsional":
-input:position,distance,bonds,atom_total_num,atom_carbon_num
-output: 
+input:position,distance,bonds,atom_total_num,atom_carbon_num                                                                                                           
+output: E_torsion(the torsional energy of molecule)
+
+role: 
+this function is used for finding four atoms which could form a torsional, and the Connection of atoms is A-B-C-D
+this function first determine the central atom B and C, then arranging and combining atoms directly connected to B atom and atoms directly connected to C atom
+here I use methylcyclopropane as an example to explain the working principle of this function
+col(1) col(2) col(3) col(4)............col(atom_total_num+1)                                                                                                           
+-1,      cc12,   -1,      -1,..............1                                                                                                                           
+cc21,    -1,     cc23,    cc24,............3                                                                                                                           
+-1,      cc32,   -1,      cc34,............2                                                                                                                           
+-1,      cc42,   cc43,    -1,..............2                                                                                                                           
+.........................................
+........................................                                                                                                                               
+first, finding atom B
+       check the col(atom_total_num+1), only when the value is bigger than 1, this atom could be the central atom in torsional angle. Therefore, carbon atom 1(row 1)
+is skiped, recording carbon atom 2(row 2) as atom B in torsional angle A-B-C-D
+
+second,finding atom C which both connects directly with atom B and also could be the central atom in torsional angle. To do this, we start loop the element in row 2
+we find the element bonds(2,1) in row two is bigger than 0, this means carbon atom 1 is directly conects with carbon atom 2(atom B), but i = 2,j=1, i>j, so carbon 
+atom 1 just directly conects with carbon atom 2(atom B),but can not be the central atom in torsional angle, skiped. Then bonds(2,3) is bigger than 0, and i<j, then we
+check that bonds(atom_total_num+1,3) = 2, bigger than 1. Hence,we could say carbon atom 3 connects directly with carbon atom 2 and also could be the central atom in
+torsional angle, recording carbon atom 3(row 3) as atom C in torsional angle A-B-C-D
+
+third, finding atom A
+the atom A is atoms directly connects with atom B(carbon atom 2) expect atom C(carbon atom 3), here, we could find bonds(2,1) and bonds(2,4) is bigger than 0
+therefore, atom A have two choice, carbon atom 1 and carbon atom 4
+
+fourth, finding atom D
+the atom D is atoms directly connects with atom C(carbon atom 3) expect atom B(carbon atom 2), here, we could find only bonds(3,4) is bigger than 0
+therefore, atom D have only one choice, carbon atom 4
+
+fifth, permutation
+After permutation,we find 1-2-3-4 and 4-2-3-4 two case. But the second case contains carbon atom 4 two times,abandon. So, the torsional angle is only one:1-2-3-4
+cand find the coordinate of carbon atom 1,2,3,4 in matrix position(2,:),position(3,:),position(4,:),position(1,:) and input the A,B,C,D four atom's coordinate into
+ "Torsional_Energy" in module func and get the torsional energy of torsional angle 1-2-3-4. 
+ 
+ sixth, using the same method loop other row in matrix bonds(:,:) whose bonds(row_number,atom_total_num+1) >1 and finally get the whole torsional energy of molecule
+
 
 
 
