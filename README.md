@@ -29,6 +29,7 @@ f.the input document need to be put in the same file with the program
 !********************************************************************************************************
 !********************************************************************************************************
 !********************************************************************************************************
+
 structure of program
 
 First, the main program call a subroutine called "readfile" in module driven
@@ -135,6 +136,32 @@ on the index i,j and atom_carbon_num to distinguish the interaction type(cc or c
 In "vdw_Energy", it first check if diatance(i,j) > 4A. only when the distance between two atoms bigger than 4A, "vdw_Energy" call "Vdw_Energy" in module func and
 give the corresponding vdw energy between two atoms. the input of "Vdw_Energy" is the same as Electrostatic_Energy"
 
+
+"Bending":
+input:distance(atom_total_num,atom_total_num+1),bonds(atom_total_num,atom_total_num+1),atom_total_num(integer),atom_carbon_num(integer)
+output: E_bending(the bending energy of molecule)
+
+role: here I use methylcyclopropane as an example to explain the working principle of this function
+
+the bonds(atom_total_num,atom_total_num+1) of methylcyclopropane will looks like :
+col(1) col(2) col(3) col(4)............col(atom_total_num+1)
+-1      cc12   -1      -1..............1                
+cc21    -1     cc23    cc24............3              
+-1      cc32   -1      cc34............2              
+-1      cc42   cc43    -1..............2                
+.........................................
+........................................
+first check the col(atom_total_num+1), only the value bigger than 1 will form bending, so we do not loop the first row because the value in col(atom_total_num+1) is
+1, means atom carbon 1 only form one carbon carbon bond with surrounding carbons.
+in the second row, there are three elements bigger than 0, means atom carbon 2 form 3 carbon carbon bonds with atom carbon 1.atom carbon 3,atom carbon 4, then we do
+permutations could get 213,214,234 three bending angle which all the Aagle centered on the atom carbon 2. The same operation for row three and row four and get 324,423
+bending angle.
+Then, use bending angle 213 as an example, we acquire distance(2,1),diatance(2,3),distance(1,3) through matrix distance(atom_total_num,atom_total_num+1),the input 
+distance(2,1),diatance(2,3),distance(1,3) to "Bending_Energy" in module func, and get the bending angle of bending angle 213
+
+"Torsional":
+input:position,distance,bonds,atom_total_num,atom_carbon_num
+output: 
 
 
 
