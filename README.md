@@ -146,10 +146,10 @@ role: here I use methylcyclopropane as an example to explain the working princip
 the bonds(atom_total_num,atom_total_num+1) of methylcyclopropane will looks like :                                                                                     
 
 col(1) col(2) col(3) col(4)............col(atom_total_num+1)                                                                                                           
--1      cc12   -1      -1..............1                                                                                                                               
-cc21    -1     cc23    cc24............3                                                                                                                               
--1      cc32   -1      cc34............2                                                                                                                               
--1      cc42   cc43    -1..............2                                                                                                                               
+-1,      cc12,   -1,      -1,..............1                                                                                                                           
+cc21,    -1,     cc23,    cc24,............3                                                                                                                           
+-1,      cc32,   -1,      cc34,............2                                                                                                                           
+-1,      cc42,   cc43,    -1,..............2                                                                                                                           
 .........................................
 ........................................
 first check the col(atom_total_num+1), only the value bigger than 1 will form bending, so we do not loop the first row because the value in col(atom_total_num+1) is
