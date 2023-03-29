@@ -192,9 +192,11 @@ module calculate
                              do l = 1, atom_carbon_num!This do loop is used to find a carbon atom directly connected to the n_c atom and calculate the torsional energy between atom n_a,n_b,n_c,n_d
                                  if(bonds(j,l)>0 .and. l/= i .and. l/=j .and. l/=k) then
                                      n_d = l
+                                     if(n_a /= n_d) then
                                      E_tor_tem= Torsional_Energy(position(n_a,:),position(n_b,:),position(n_c,:),position(n_d,:))!  Torsional_Energy(A,B,C,D)
                                       E_torsion =  E_torsion +E_tor_tem
                                       E_tor_tem = 0
+                                      end if
                                      end if
                              end do
                          end if
